@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DADDY'S FORGE | Brand Strategy Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap');
+
+        :root {
+            --daddy-yellow: #dbe120;
+            --daddy-gray: #303030;
+            --bg-dark: #0a0a0a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg-dark);
+            color: #ffffff;
+            font-family: 'Space Mono', monospace;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3 {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: -0.02em;
+        }
+
+        .daddy-yellow { color: var(--daddy-yellow); }
+        .bg-daddy { background-color: var(--daddy-yellow); color: #000; }
+        .border-daddy { border: 2px solid var(--daddy-yellow); }
+
+        input, select {
+            background: var(--daddy-gray);
+            border: 1px solid rgba(219, 225, 32, 0.2);
+            padding: 16px 18px;
+            width: 100%;
+            color: #fff;
+            outline: none;
+            font-family: 'Space Mono', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--daddy-yellow);
+            background: rgba(219, 225, 32, 0.05);
+            box-shadow: 0 0 0 3px rgba(219, 225, 32, 0.1);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23dbe120' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-color: var(--daddy-gray);
+            padding-right: 45px;
+        }
+
+        select option {
+            background: var(--daddy-gray);
+            color: #fff;
+            padding: 10px;
+        }
+
+        .character-container {
+            position: fixed;
+            bottom: -30px;
+            right: 3%;
+            height: 70vh;
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .character-container img {
+            height: 100%;
+            width: auto;
+            filter: drop-shadow(0 0 40px rgba(219, 225, 32, 0.3));
+        }
+
+        .capture-area {
+            background: linear-gradient(180deg, #0d0d0d 0%, #141414 100%);
+            position: relative;
+            border-radius: 4px;
+        }
+
+        .copy-box {
+            background: rgba(48, 48, 48, 0.8);
+            border: 1px dashed rgba(219, 225, 32, 0.4);
+            padding: 1.5rem;
+            border-radius: 2px;
+        }
+
+        button {
+            transition: all 0.3s ease;
+            border-radius: 2px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(219, 225, 32, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--daddy-yellow);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .card {
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(219, 225, 32, 0.15);
+            border-radius: 4px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--daddy-yellow), transparent);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease;
+        }
+
+        .glow {
+            box-shadow: 0 0 30px rgba(219, 225, 32, 0.4);
+        }
+
+        .watermark {
+            font-family: 'Archivo Black', sans-serif;
+            font-style: italic;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            opacity: 0.15;
+            font-size: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .character-container {
+                right: -15%;
+                opacity: 0.15;
+                height: 55vh;
+            }
+        }
+
+        .daddy-quote {
+            font-size: 11px;
+            opacity: 0.5;
+            font-style: italic;
+            border-left: 2px solid var(--daddy-yellow);
+            padding-left: 12px;
+            margin: 12px 0;
+        }
+
+        /* Social Share Card - Hidden by default */
+        #socialCard {
+            position: fixed;
+            left: -9999px;
+            top: -9999px;
+            width: 1080px;
+            height: 1350px;
+            background: var(--bg-dark);
+            padding: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-6">
+
+    <!-- Character Image -->
+    <div class="character-container">
+        <img id="characterImg" alt="Daddy">
+    </div>
+
+    <!-- Social Share Card (Hidden) -->
+    <div id="socialCard">
+        <div style="text-align: center; max-width: 920px;">
+            <h2 style="font-family: 'Archivo Black', sans-serif; font-style: italic; text-transform: uppercase; font-size: 120px; line-height: 0.9; color: #dbe120; margin-bottom: 60px; letter-spacing: -0.02em;">
+                DADDY<br>TOLD ME...
+            </h2>
+            <p id="socialMantra" style="font-family: 'Space Mono', monospace; font-size: 42px; line-height: 1.4; color: #ffffff; font-weight: bold; margin-bottom: 80px;">
+            </p>
+            <div style="width: 200px; height: 3px; background: #dbe120; margin: 0 auto 40px;"></div>
+            <p style="font-family: 'Archivo Black', sans-serif; font-style: italic; text-transform: uppercase; font-size: 32px; color: rgba(219, 225, 32, 0.3); letter-spacing: 0.1em;">
+                YOUR FREELANCE DADDY
+            </p>
+        </div>
+    </div>
+
+    <!-- SETUP SCREEN -->
+    <div id="setup" class="max-w-3xl w-full z-10 fade-in">
+        <div class="card space-y-8">
+            <header class="text-center space-y-4 pb-6 border-b border-white/5">
+                <h1 class="text-5xl md:text-7xl leading-[0.85] tracking-tight">
+                    Daddy's<br><span class="daddy-yellow" style="font-size: 1.2em;">Forge</span>
+                </h1>
+                <p class="daddy-quote">
+                    "Let Daddy make your brand hard."
+                </p>
+                <div class="flex items-center justify-center gap-3 pt-2">
+                    <div class="h-px w-12 bg-gradient-to-r from-transparent to-yellow-500/30"></div>
+                    <span class="text-[8px] uppercase tracking-widest opacity-40">Strategic Positioning Tool</span>
+                    <div class="h-px w-12 bg-gradient-to-l from-transparent to-yellow-500/30"></div>
+                </div>
+            </header>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="label">01. Who are you targeting?</label>
+                    <input id="aud" type="text" placeholder="Your competitor, market, or dream client...">
+                    <p class="text-[9px] opacity-30 mt-2 ml-1">The person or brand you want to dominate</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="label">02. What makes you different?</label>
+                        <input id="edge" type="text" placeholder="Your superpower...">
+                        <p class="text-[9px] opacity-30 mt-2 ml-1">Your secret weapon nobody else has</p>
+                    </div>
+
+                    <div>
+                        <label class="label">03. What's stopping you?</label>
+                        <input id="obs" type="text" placeholder="Your biggest roadblock...">
+                        <p class="text-[9px] opacity-30 mt-2 ml-1">Fear, money, time, or something else?</p>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="label">04. Pick Your Power Move</label>
+                    <select id="vibe">
+                        <option value="BRUTAL">⚡ BRUTAL — Move fast and break things</option>
+                        <option value="COLD">❄️ COLD — Build systems that never sleep</option>
+                        <option value="ELITE">👑 ELITE — Charge premium, work with the best</option>
+                        <option value="SOVEREIGN">🗡️ SOVEREIGN — Own everything, answer to nobody</option>
+                        <option value="SHADOW">🌑 SHADOW — Win quietly while others fight loudly</option>
+                        <option value="ICON">⭐ ICON — Become the story everyone tells</option>
+                    </select>
+                    <p class="text-[9px] opacity-30 mt-2 ml-1">Choose the strategy that fits your vibe</p>
+                </div>
+            </div>
+
+            <button type="button" onclick="forge()" class="bg-daddy w-full py-5 text-base font-black uppercase italic tracking-tight hover:bg-white transition-all glow">
+                ⚡ Let Daddy Cook
+            </button>
+        </div>
+    </div>
+
+    <!-- RESULT SCREEN -->
+    <div id="result" class="hidden max-w-4xl w-full z-10 space-y-6 fade-in">
+        <div id="capture" class="capture-area border-daddy p-8 md:p-12">
+            <!-- Header -->
+            <div class="flex flex-col md:flex-row justify-between md:items-start gap-4 mb-12 pb-6 border-b border-yellow-500/20">
+                <div>
+                    <h2 class="text-4xl md:text-5xl italic tracking-tight mb-2">Daddy's<br><span class="daddy-yellow">Verdict</span></h2>
+                    <p class="text-[9px] opacity-40 uppercase tracking-[0.3em]">Generated <span id="dt"></span></p>
+                </div>
+                <div class="flex flex-col items-start md:items-end gap-2">
+                    <div class="text-[10px] font-bold border border-yellow-500/30 px-3 py-1.5 opacity-70 bg-yellow-500/5">
+                        READY TO EXECUTE
+                    </div>
+                    <div class="text-[9px] opacity-30" id="doctrine-badge"></div>
+                </div>
+            </div>
+
+            <!-- Diagnostic -->
+            <div class="mb-10">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-1 h-6 bg-daddy"></div>
+                    <h3 class="daddy-yellow text-[11px] uppercase tracking-[0.2em] font-bold">What Daddy Sees</h3>
+                </div>
+                <p id="diag" class="text-2xl md:text-3xl font-bold leading-tight tracking-tight text-gray-100 pl-4"></p>
+            </div>
+
+            <!-- Command String -->
+            <div class="mb-12">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-1 h-6 bg-daddy"></div>
+                    <h3 class="daddy-yellow text-[11px] uppercase tracking-[0.2em] font-bold">Copy This. Paste It. Watch Magic Happen.</h3>
+                </div>
+                <div class="copy-box pl-4">
+                    <p id="prompt" class="text-sm leading-relaxed font-normal text-gray-300"></p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-between items-center pt-6 border-t border-white/5">
+                <p class="watermark">Your Freelance Daddy</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-16 h-0.5 bg-daddy"></div>
+                    <span class="text-xs opacity-40">⚡</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button onclick="copyToClipboard()" class="bg-white text-black py-4 font-bold uppercase text-[11px] tracking-wider hover:bg-yellow-300">
+                📋 Copy Strategy
+            </button>
+            <button onclick="downloadPNG()" class="border-2 border-yellow-500/30 py-4 font-bold uppercase text-[11px] tracking-wider hover:bg-yellow-500/10">
+                🖼 Save Social Card
+            </button>
+            <button onclick="generatePDF()" class="border-2 border-yellow-500/30 py-4 font-bold uppercase text-[11px] tracking-wider hover:bg-yellow-500/10">
+                📄 Download PDF
+            </button>
+        </div>
+
+        <button onclick="location.reload()" class="w-full text-center text-[9px] opacity-30 mt-6 py-3 uppercase tracking-widest hover:opacity-60 transition-opacity">
+            ← Start Over
+        </button>
+    </div>
+
+    <script>
+        // Load character image
+        window.onload = function() {
+            const img = document.getElementById('characterImg');
+            img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600"%3E%3Crect fill="%23303030" width="400" height="600"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" fill="%23dbe120" font-size="60" font-family="Arial" opacity="0.3"%3EDADDY%3C/text%3E%3C/svg%3E';
+        };
+
+        function forge() {
+            const a = document.getElementById('aud').value || 'your target market';
+            const e = document.getElementById('edge').value || 'your core advantage';
+            const o = document.getElementById('obs').value || 'internal resistance';
+            const v = document.getElementById('vibe').value;
+
+            const diags = {
+                BRUTAL: `Stop negotiating with "${o}". Use "${e}" to move faster than ${a} can react. Strike hard, strike now.`,
+                COLD: `"${o}" is just noise. Turn "${e}" into a system that runs 24/7 while ${a} struggles to keep up.`,
+                ELITE: `You're charging too little. "${o}" doesn't matter when "${e}" positions you as the only choice ${a} can afford NOT to make.`,
+                SOVEREIGN: `Forget asking permission. Strip away "${o}" and build "${e}" into something you own completely—${a} becomes irrelevant.`,
+                SHADOW: `Being loud is overrated. Deploy "${e}" quietly, sidestep "${o}", and let ${a} wonder what hit them after it's too late.`,
+                ICON: `"${e}" isn't just what you do—it's who you are. Master the story, and "${o}" fades while ${a} starts following YOUR lead.`
+            };
+
+            const mantras = {
+                BRUTAL: `Speed kills hesitation. Move now, dominate later.`,
+                COLD: `Systems beat motivation. Build once, win forever.`,
+                ELITE: `Premium isn't a price point—it's a perspective.`,
+                SOVEREIGN: `Own your empire. Answer to no one.`,
+                SHADOW: `The best battles are won before they're fought.`,
+                ICON: `Be the story they can't stop telling.`
+            };
+
+            const prompts = {
+                BRUTAL: `You're a strategic advisor who believes in speed and force.
+
+Here's my situation:
+- Target: ${a}
+- My advantage: ${e}
+- What's blocking me: ${o}
+
+I need you to help me move FAST and hit HARD.
+
+Give me:
+1. A powerful positioning statement (first-person, make it bold)
+2. A 12-month action plan with quarterly goals focused on quick wins
+3. A content strategy that gets maximum attention fast
+4. The specific numbers I should track to know I'm winning
+
+Rules:
+- No slow strategies—everything needs immediate impact
+- Focus on high-leverage moves only
+- Be direct and aggressive in your tone
+- Write this like I'm executing tomorrow
+
+Make it sharp. Make it aggressive. Make it work.`,
+
+                COLD: `You're a strategic advisor who builds systems that run themselves.
+
+Here's my situation:
+- Target: ${a}
+- My advantage: ${e}
+- What's blocking me: ${o}
+
+I need you to help me build something systematic and repeatable.
+
+Give me:
+1. A logical positioning statement (first-person, make it inevitable)
+2. A 12-month system with quarterly phases that compound
+3. A content approach that works automatically
+4. The key metrics that prove the system works
+
+Rules:
+- Emotions don't matter—only data and logic
+- Build systems, not campaigns
+- Everything should be repeatable
+- Keep the tone analytical and precise
+
+Make it systematic. Make it automatic. Make it unstoppable.`,
+
+                ELITE: `You're a strategic advisor who specializes in premium positioning.
+
+Here's my situation:
+- Target: ${a}
+- My advantage: ${e}
+- What's blocking me: ${o}
+
+I need you to help me become the ONLY choice for top-tier clients.
+
+Give me:
+1. A premium positioning statement (first-person, make it exclusive)
+2. A 12-month elevation plan with quarterly prestige milestones
+3. A visibility strategy built on scarcity and value
+4. Status signals that prove I'm elite
+
+Rules:
+- Mass market is the enemy—I want the top 5% only
+- Price is never the issue—value is everything
+- Every detail should scream quality
+- Keep the tone sophisticated and confident
+
+Make it premium. Make it exclusive. Make it irresistible.`,
+
+                SOVEREIGN: `You're a strategic advisor focused on independence and ownership.
+
+Here's my situation:
+- Target: ${a}
+- My advantage: ${e}
+- What's blocking me: ${o}
+
+I need you to help me build something I OWN completely.
+
+Give me:
+1. An independence statement (first-person, make it powerful)
+2. A 12-month sovereignty plan with quarterly self-sufficiency goals
+3. A strategy built on owned channels and direct relationships
+4. Metrics that prove I'm truly independent (revenue, audience, platform freedom)
+
+Rules:
+- Platform dependency is weakness—I own the infrastructure
+- I don't need external validation
+- Long-term control beats short-term growth
+- Keep the tone authoritative and independent
+
+Make it sovereign. Make it mine. Make it last.`,
+
+                SHADOW: `You're a strategic advisor who wins through indirect moves.
+
+Here's my situation:
+- Target: ${a}
+- My advantage: ${e}
+- What's blocking me: ${o}
+
+I need you to help me win WITHOUT direct competition.
+
+Give me:
+1. A positioning statement that emphasizes indirect advantage (first-person)
+2. A 12-month stealth plan with quarterly unconventional plays
+3. A visibility strategy focused on strategic presence (not constant visibility)
+4. Non-obvious success metrics that reveal hidden leverage
+
+Rules:
+- Avoid head-on battles—find undefended territory
+- Visibility is a tool, not a goal
+- The best moves are the ones they don't see coming
+- Keep the tone subtle and strategic
+
+Make it indirect. Make it smart. Make it invisible until it's too late.`,
+
+                ICON: `You're a strategic advisor who builds legendary brands through storytelling.
+
+Here's my situation:
+- Target: ${a}
+- My advantage: ${e}
+- What's blocking me: ${o}
+
+I need you to help me become a SYMBOL, not just a service.
+
+Give me:
+1. A narrative positioning statement (first-person, make it mythical)
+2. A 12-month story plan with quarterly narrative milestones
+3. A visibility strategy built on storytelling and meaning
+4. Cultural metrics (how deeply people connect with the story)
+
+Rules:
+- Features are boring—story is everything
+- I'm not competing, I'm creating a new category
+- People buy meaning, not products
+- Keep the tone visionary and magnetic
+
+Make it mythical. Make it memorable. Make it mean something.`
+            };
+
+            document.getElementById('diag').innerText = diags[v];
+            document.getElementById('prompt').innerText = prompts[v];
+            document.getElementById('socialMantra').innerText = mantras[v];
+            document.getElementById('dt').innerText = new Date().toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+            document.getElementById('doctrine-badge').innerText = `Strategy: ${v}`;
+
+            document.getElementById('setup').classList.add('hidden');
+            document.getElementById('result').classList.remove('hidden');
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('prompt').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target;
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '✓ COPIED';
+                btn.style.background = '#dbe120';
+                btn.style.color = '#000';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }, 2000);
+            });
+        }
+
+        function downloadPNG() {
+            const socialCard = document.getElementById('socialCard');
+            
+            html2canvas(socialCard, {
+                backgroundColor: '#0a0a0a',
+                scale: 2,
+                logging: false,
+                width: 1080,
+                height: 1350
+            }).then(canvas => {
+                canvas.toBlob(function(blob) {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.download = `Daddy-Mantra-${Date.now()}.png`;
+                    link.href = url;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                });
+            });
+        }
+
+        function generatePDF() {
+            const captureElement = document.querySelector('#capture');
+            
+            html2canvas(captureElement, {
+                backgroundColor: '#0d0d0d',
+                scale: 3,
+                logging: false,
+                useCORS: true
+            }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                
+                const imgWidth = 210;
+                const pageHeight = 297;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                const doc = new jsPDF('p', 'mm', 'a4');
+                
+                const imgData = canvas.toDataURL('image/png');
+                doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                
+                doc.save(`Daddys-Verdict-${Date.now()}.pdf`);
+            });
+        }
+    </script>
+</body>
+</html>
