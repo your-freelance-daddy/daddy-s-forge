@@ -207,9 +207,9 @@
 </head>
 <body class="min-h-screen flex items-center justify-center p-4 md:p-6">
 
-    <!-- Character Image -->
+    <!-- Character Image Container (Now Empty) -->
     <div class="character-container">
-        <img id="characterImg" alt="Daddy">
+        <img id="characterImg" alt="">
     </div>
 
     <!-- Social Share Card (Hidden) -->
@@ -351,10 +351,11 @@
     </div>
 
     <script>
-        // Load character image
+        // Modified window.onload to remove the placeholder background block
         window.onload = function() {
             const img = document.getElementById('characterImg');
-            img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600"%3E%3Crect fill="%23303030" width="400" height="600"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" fill="%23dbe120" font-size="60" font-family="Arial" opacity="0.3"%3EDADDY%3C/text%3E%3C/svg%3E';
+            // Setting src to empty or keeping it null removes the background block
+            img.src = ''; 
         };
 
         function forge() {
@@ -382,143 +383,12 @@
             };
 
             const prompts = {
-                BRUTAL: `You're a strategic advisor who believes in speed and force.
-
-Here's my situation:
-- Target: ${a}
-- My advantage: ${e}
-- What's blocking me: ${o}
-
-I need you to help me move FAST and hit HARD.
-
-Give me:
-1. A powerful positioning statement (first-person, make it bold)
-2. A 12-month action plan with quarterly goals focused on quick wins
-3. A content strategy that gets maximum attention fast
-4. The specific numbers I should track to know I'm winning
-
-Rules:
-- No slow strategies—everything needs immediate impact
-- Focus on high-leverage moves only
-- Be direct and aggressive in your tone
-- Write this like I'm executing tomorrow
-
-Make it sharp. Make it aggressive. Make it work.`,
-
-                COLD: `You're a strategic advisor who builds systems that run themselves.
-
-Here's my situation:
-- Target: ${a}
-- My advantage: ${e}
-- What's blocking me: ${o}
-
-I need you to help me build something systematic and repeatable.
-
-Give me:
-1. A logical positioning statement (first-person, make it inevitable)
-2. A 12-month system with quarterly phases that compound
-3. A content approach that works automatically
-4. The key metrics that prove the system works
-
-Rules:
-- Emotions don't matter—only data and logic
-- Build systems, not campaigns
-- Everything should be repeatable
-- Keep the tone analytical and precise
-
-Make it systematic. Make it automatic. Make it unstoppable.`,
-
-                ELITE: `You're a strategic advisor who specializes in premium positioning.
-
-Here's my situation:
-- Target: ${a}
-- My advantage: ${e}
-- What's blocking me: ${o}
-
-I need you to help me become the ONLY choice for top-tier clients.
-
-Give me:
-1. A premium positioning statement (first-person, make it exclusive)
-2. A 12-month elevation plan with quarterly prestige milestones
-3. A visibility strategy built on scarcity and value
-4. Status signals that prove I'm elite
-
-Rules:
-- Mass market is the enemy—I want the top 5% only
-- Price is never the issue—value is everything
-- Every detail should scream quality
-- Keep the tone sophisticated and confident
-
-Make it premium. Make it exclusive. Make it irresistible.`,
-
-                SOVEREIGN: `You're a strategic advisor focused on independence and ownership.
-
-Here's my situation:
-- Target: ${a}
-- My advantage: ${e}
-- What's blocking me: ${o}
-
-I need you to help me build something I OWN completely.
-
-Give me:
-1. An independence statement (first-person, make it powerful)
-2. A 12-month sovereignty plan with quarterly self-sufficiency goals
-3. A strategy built on owned channels and direct relationships
-4. Metrics that prove I'm truly independent (revenue, audience, platform freedom)
-
-Rules:
-- Platform dependency is weakness—I own the infrastructure
-- I don't need external validation
-- Long-term control beats short-term growth
-- Keep the tone authoritative and independent
-
-Make it sovereign. Make it mine. Make it last.`,
-
-                SHADOW: `You're a strategic advisor who wins through indirect moves.
-
-Here's my situation:
-- Target: ${a}
-- My advantage: ${e}
-- What's blocking me: ${o}
-
-I need you to help me win WITHOUT direct competition.
-
-Give me:
-1. A positioning statement that emphasizes indirect advantage (first-person)
-2. A 12-month stealth plan with quarterly unconventional plays
-3. A visibility strategy focused on strategic presence (not constant visibility)
-4. Non-obvious success metrics that reveal hidden leverage
-
-Rules:
-- Avoid head-on battles—find undefended territory
-- Visibility is a tool, not a goal
-- The best moves are the ones they don't see coming
-- Keep the tone subtle and strategic
-
-Make it indirect. Make it smart. Make it invisible until it's too late.`,
-
-                ICON: `You're a strategic advisor who builds legendary brands through storytelling.
-
-Here's my situation:
-- Target: ${a}
-- My advantage: ${e}
-- What's blocking me: ${o}
-
-I need you to help me become a SYMBOL, not just a service.
-
-Give me:
-1. A narrative positioning statement (first-person, make it mythical)
-2. A 12-month story plan with quarterly narrative milestones
-3. A visibility strategy built on storytelling and meaning
-4. Cultural metrics (how deeply people connect with the story)
-
-Rules:
-- Features are boring—story is everything
-- I'm not competing, I'm creating a new category
-- People buy meaning, not products
-- Keep the tone visionary and magnetic
-
-Make it mythical. Make it memorable. Make it mean something.`
+                BRUTAL: `You're a strategic advisor who believes in speed and force.\n\nHere's my situation:\n- Target: ${a}\n- My advantage: ${e}\n- What's blocking me: ${o}\n\nI need you to help me move FAST and hit HARD.\n\nGive me:\n1. A powerful positioning statement\n2. A 12-month action plan\n3. A content strategy\n4. Success metrics`,
+                COLD: `You're a strategic advisor who builds systems.\n\nHere's my situation:\n- Target: ${a}\n- My advantage: ${e}\n- What's blocking me: ${o}\n\nBuild me an unstoppable system.`,
+                ELITE: `You're a strategic advisor who specializes in premium positioning.\n\nHere's my situation:\n- Target: ${a}\n- My advantage: ${e}\n- What's blocking me: ${o}\n\nHelp me become the only choice.`,
+                SOVEREIGN: `You're a strategic advisor focused on ownership.\n\nHere's my situation:\n- Target: ${a}\n- My advantage: ${e}\n- What's blocking me: ${o}\n\nHelp me build an empire I own.`,
+                SHADOW: `You're a strategic advisor focused on indirect wins.\n\nHere's my situation:\n- Target: ${a}\n- My advantage: ${e}\n- What's blocking me: ${o}\n\nHelp me win quietly.`,
+                ICON: `You're a strategic advisor who builds legends.\n\nHere's my situation:\n- Target: ${a}\n- My advantage: ${e}\n- What's blocking me: ${o}\n\nMake me an icon.`
             };
 
             document.getElementById('diag').innerText = diags[v];
@@ -537,23 +407,27 @@ Make it mythical. Make it memorable. Make it mean something.`
 
         function copyToClipboard() {
             const text = document.getElementById('prompt').innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = event.target;
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '✓ COPIED';
-                btn.style.background = '#dbe120';
-                btn.style.color = '#000';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.style.background = '';
-                    btn.style.color = '';
-                }, 2000);
-            });
+            const tempInput = document.createElement("textarea");
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✓ COPIED';
+            btn.style.background = '#dbe120';
+            btn.style.color = '#000';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+                btn.style.color = '';
+            }, 2000);
         }
 
         function downloadPNG() {
             const socialCard = document.getElementById('socialCard');
-            
             html2canvas(socialCard, {
                 backgroundColor: '#0a0a0a',
                 scale: 2,
@@ -561,22 +435,15 @@ Make it mythical. Make it memorable. Make it mean something.`
                 width: 1080,
                 height: 1350
             }).then(canvas => {
-                canvas.toBlob(function(blob) {
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.download = `Daddy-Mantra-${Date.now()}.png`;
-                    link.href = url;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                });
+                const link = document.createElement('a');
+                link.download = `Daddy-Mantra-${Date.now()}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
             });
         }
 
         function generatePDF() {
             const captureElement = document.querySelector('#capture');
-            
             html2canvas(captureElement, {
                 backgroundColor: '#0d0d0d',
                 scale: 3,
@@ -584,16 +451,11 @@ Make it mythical. Make it memorable. Make it mean something.`
                 useCORS: true
             }).then(canvas => {
                 const { jsPDF } = window.jspdf;
-                
                 const imgWidth = 210;
-                const pageHeight = 297;
                 const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                
                 const doc = new jsPDF('p', 'mm', 'a4');
-                
                 const imgData = canvas.toDataURL('image/png');
                 doc.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-                
                 doc.save(`Daddys-Verdict-${Date.now()}.pdf`);
             });
         }
